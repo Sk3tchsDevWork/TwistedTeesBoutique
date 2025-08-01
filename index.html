@@ -122,11 +122,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
-                    <button class="text-gray-700 hover:text-gray-900 transition-colors relative">
+                    <button id="cart-button" class="text-gray-700 hover:text-gray-900 transition-colors relative">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                         </svg>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                     </button>
                 </div>
             </div>
@@ -282,19 +282,19 @@
                 <div>
                     <h5 class="font-semibold text-gray-900 mb-4">Quick Links</h5>
                     <ul class="space-y-2 text-gray-600">
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">About Us</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Size Guide</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Shipping Info</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Returns</a></li>
+                        <li><a href="#" onclick="showModal('about')" class="hover:text-gray-900 transition-colors cursor-pointer">About Us</a></li>
+                        <li><a href="#" onclick="showModal('size-guide')" class="hover:text-gray-900 transition-colors cursor-pointer">Size Guide</a></li>
+                        <li><a href="#" onclick="showModal('shipping')" class="hover:text-gray-900 transition-colors cursor-pointer">Shipping Info</a></li>
+                        <li><a href="#" onclick="showModal('returns')" class="hover:text-gray-900 transition-colors cursor-pointer">Returns</a></li>
                     </ul>
                 </div>
                 <div>
                     <h5 class="font-semibold text-gray-900 mb-4">Customer Service</h5>
                     <ul class="space-y-2 text-gray-600">
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Contact Us</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">FAQ</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Track Order</a></li>
-                        <li><a href="#" class="hover:text-gray-900 transition-colors">Support</a></li>
+                        <li><a href="#" onclick="showModal('contact')" class="hover:text-gray-900 transition-colors cursor-pointer">Contact Us</a></li>
+                        <li><a href="#" onclick="showModal('faq')" class="hover:text-gray-900 transition-colors cursor-pointer">FAQ</a></li>
+                        <li><a href="#" onclick="showModal('track-order')" class="hover:text-gray-900 transition-colors cursor-pointer">Track Order</a></li>
+                        <li><a href="#" onclick="showModal('support')" class="hover:text-gray-900 transition-colors cursor-pointer">Support</a></li>
                     </ul>
                 </div>
                 <div>
@@ -360,7 +360,7 @@
                     
                     // Update cart count
                     cartCount++;
-                    const cartBadge = document.querySelector('.absolute.-top-2.-right-2');
+                    const cartBadge = document.getElementById('cart-count');
                     cartBadge.textContent = cartCount;
                     
                     // Visual feedback
@@ -375,7 +375,7 @@
         });
 
         // Cart view functionality
-        document.querySelector('button svg').closest('button').addEventListener('click', function() {
+        document.getElementById('cart-button').addEventListener('click', function() {
             showCartModal();
         });
 
@@ -451,7 +451,7 @@
         function removeFromCart(itemId) {
             cart = cart.filter(item => item.id !== itemId);
             cartCount = cart.length;
-            const cartBadge = document.querySelector('.absolute.-top-2.-right-2');
+            const cartBadge = document.getElementById('cart-count');
             cartBadge.textContent = cartCount;
             
             // Refresh cart modal
@@ -466,14 +466,390 @@
             }
         });
 
+        // Modal system for footer links
+        function showModal(type) {
+            const modalContent = getModalContent(type);
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden soft-shadow">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold gradient-text">${modalContent.title}</h3>
+                            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 max-h-96 overflow-y-auto">
+                        ${modalContent.content}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function getModalContent(type) {
+            const content = {
+                'about': {
+                    title: 'About Twisted Tees Boutique',
+                    content: `
+                        <div class="space-y-4">
+                            <p class="text-gray-700">Welcome to Twisted Tees Boutique, where fashion meets individuality! Founded with a passion for unique, high-quality clothing, we curate collections that speak to your personal style.</p>
+                            <p class="text-gray-700">Our mission is to provide premium fashion pieces that make you feel confident and express your unique personality. From elegant dresses to casual wear, we offer carefully selected items that combine comfort, style, and quality.</p>
+                            <p class="text-gray-700">Every piece in our collection is chosen with care, ensuring that you receive only the finest materials and craftsmanship. We believe fashion should be accessible, sustainable, and most importantly, fun!</p>
+                            <div class="mt-6 p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg">
+                                <h4 class="font-semibold gradient-text mb-2">Our Values:</h4>
+                                <ul class="text-gray-700 space-y-1">
+                                    <li>• Quality craftsmanship in every piece</li>
+                                    <li>• Sustainable and ethical fashion practices</li>
+                                    <li>• Exceptional customer service</li>
+                                    <li>• Celebrating individual style</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                'size-guide': {
+                    title: 'Size Guide',
+                    content: `
+                        <div class="space-y-6">
+                            <p class="text-gray-700">Find your perfect fit with our comprehensive size guide. All measurements are in inches.</p>
+                            
+                            <div class="bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-3">Women's Clothing</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr class="border-b">
+                                                <th class="text-left py-2">Size</th>
+                                                <th class="text-left py-2">Bust</th>
+                                                <th class="text-left py-2">Waist</th>
+                                                <th class="text-left py-2">Hips</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-700">
+                                            <tr><td class="py-1">XS</td><td>32-34</td><td>24-26</td><td>34-36</td></tr>
+                                            <tr><td class="py-1">S</td><td>34-36</td><td>26-28</td><td>36-38</td></tr>
+                                            <tr><td class="py-1">M</td><td>36-38</td><td>28-30</td><td>38-40</td></tr>
+                                            <tr><td class="py-1">L</td><td>38-40</td><td>30-32</td><td>40-42</td></tr>
+                                            <tr><td class="py-1">XL</td><td>40-42</td><td>32-34</td><td>42-44</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-3">Men's Clothing</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr class="border-b">
+                                                <th class="text-left py-2">Size</th>
+                                                <th class="text-left py-2">Chest</th>
+                                                <th class="text-left py-2">Waist</th>
+                                                <th class="text-left py-2">Neck</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-700">
+                                            <tr><td class="py-1">S</td><td>34-36</td><td>28-30</td><td>14-14.5</td></tr>
+                                            <tr><td class="py-1">M</td><td>38-40</td><td>32-34</td><td>15-15.5</td></tr>
+                                            <tr><td class="py-1">L</td><td>42-44</td><td>36-38</td><td>16-16.5</td></tr>
+                                            <tr><td class="py-1">XL</td><td>46-48</td><td>40-42</td><td>17-17.5</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                                <p><strong>Measuring Tips:</strong> Use a soft measuring tape and measure over undergarments. For the most accurate fit, have someone help you measure.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                'shipping': {
+                    title: 'Shipping Information',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-2">Free Shipping ✨</h4>
+                                <p class="text-gray-700">Enjoy free standard shipping on all orders over $75!</p>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">Shipping Options:</h4>
+                                <div class="space-y-2 text-gray-700">
+                                    <div class="flex justify-between">
+                                        <span>Standard Shipping (5-7 business days)</span>
+                                        <span class="font-medium">$5.99</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Express Shipping (2-3 business days)</span>
+                                        <span class="font-medium">$12.99</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Overnight Shipping (1 business day)</span>
+                                        <span class="font-medium">$24.99</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">Processing Time:</h4>
+                                <p class="text-gray-700">Orders are typically processed within 1-2 business days. You'll receive a tracking number via email once your order ships.</p>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">International Shipping:</h4>
+                                <p class="text-gray-700">We ship worldwide! International shipping rates and delivery times vary by destination. Customs fees may apply and are the responsibility of the customer.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                'returns': {
+                    title: 'Returns & Exchanges',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-2">30-Day Return Policy</h4>
+                                <p class="text-gray-700">Not completely satisfied? Return unworn items within 30 days for a full refund!</p>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">Return Conditions:</h4>
+                                <ul class="text-gray-700 space-y-1">
+                                    <li>• Items must be unworn and in original condition</li>
+                                    <li>• Original tags must be attached</li>
+                                    <li>• Items must be returned within 30 days of delivery</li>
+                                    <li>• Original packaging preferred but not required</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">How to Return:</h4>
+                                <ol class="text-gray-700 space-y-1">
+                                    <li>1. Contact our customer service team</li>
+                                    <li>2. Receive your prepaid return label</li>
+                                    <li>3. Package your items securely</li>
+                                    <li>4. Drop off at any authorized shipping location</li>
+                                    <li>5. Receive your refund within 5-7 business days</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <h4 class="font-semibold text-gray-900">Exchanges:</h4>
+                                <p class="text-gray-700">Need a different size or color? We offer free exchanges on all items. Simply follow the return process and let us know what you'd like instead!</p>
+                            </div>
+                        </div>
+                    `
+                },
+                'contact': {
+                    title: 'Contact Us',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="text-center">
+                                <p class="text-gray-700 mb-4">We'd love to hear from you! Get in touch with our friendly customer service team.</p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg p-4">
+                                    <h4 class="font-semibold gradient-text mb-3">Customer Service</h4>
+                                    <div class="space-y-2 text-gray-700">
+                                        <p>📧 support@twistedteesboutique.com</p>
+                                        <p>📞 1-800-TWISTED (1-800-894-7833)</p>
+                                        <p>💬 Live Chat: Available 9AM-6PM EST</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4">
+                                    <h4 class="font-semibold gradient-text mb-3">Business Hours</h4>
+                                    <div class="space-y-1 text-gray-700">
+                                        <p>Monday - Friday: 9AM - 6PM EST</p>
+                                        <p>Saturday: 10AM - 4PM EST</p>
+                                        <p>Sunday: Closed</p>
+                                        <p class="text-sm mt-2">*Holiday hours may vary</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-3">Quick Contact Form</h4>
+                                <form class="space-y-3">
+                                    <input type="text" placeholder="Your Name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                    <input type="email" placeholder="Your Email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                    <textarea placeholder="Your Message" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"></textarea>
+                                    <button type="submit" class="btn-primary w-full text-white py-2 rounded-lg font-semibold hover:scale-105 transition-all">Send Message ✉️</button>
+                                </form>
+                            </div>
+                        </div>
+                    `
+                },
+                'faq': {
+                    title: 'Frequently Asked Questions',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="space-y-4">
+                                <div class="border-b border-gray-200 pb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">How do I track my order?</h4>
+                                    <p class="text-gray-700">Once your order ships, you'll receive a tracking number via email. You can also track your order by logging into your account or using our Track Order feature.</p>
+                                </div>
+                                
+                                <div class="border-b border-gray-200 pb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">What payment methods do you accept?</h4>
+                                    <p class="text-gray-700">We accept all major credit cards (Visa, MasterCard, American Express, Discover), PayPal, Apple Pay, and Google Pay for your convenience.</p>
+                                </div>
+                                
+                                <div class="border-b border-gray-200 pb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">Do you offer gift cards?</h4>
+                                    <p class="text-gray-700">Yes! Digital gift cards are available in amounts from $25 to $500. Perfect for the fashion lover in your life!</p>
+                                </div>
+                                
+                                <div class="border-b border-gray-200 pb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">How do I care for my items?</h4>
+                                    <p class="text-gray-700">Care instructions are included with each item and on the product page. Generally, we recommend following the care label and washing in cold water to maintain quality.</p>
+                                </div>
+                                
+                                <div class="border-b border-gray-200 pb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">Do you restock sold-out items?</h4>
+                                    <p class="text-gray-700">We try our best to restock popular items! Sign up for restock notifications on product pages, or contact us to inquire about specific items.</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-2">Can I modify or cancel my order?</h4>
+                                    <p class="text-gray-700">Orders can be modified or cancelled within 2 hours of placement. After that, orders enter processing and cannot be changed. Contact us immediately if you need to make changes!</p>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'track-order': {
+                    title: 'Track Your Order',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="text-center">
+                                <p class="text-gray-700 mb-6">Enter your order information below to track your package.</p>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
+                                <form class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Order Number</label>
+                                        <input type="text" placeholder="e.g., TTB-12345678" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                        <input type="email" placeholder="your@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                    </div>
+                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-lg font-semibold hover:scale-105 transition-all">Track Order 📦</button>
+                                </form>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-2">Order Status Guide:</h4>
+                                <div class="space-y-2 text-sm text-gray-700">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
+                                        <span><strong>Processing:</strong> We're preparing your order</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+                                        <span><strong>Shipped:</strong> Your order is on its way</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-3 h-3 bg-green-400 rounded-full"></span>
+                                        <span><strong>Delivered:</strong> Package has arrived</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center text-sm text-gray-600">
+                                <p>Need help? Contact our customer service team at <span class="gradient-text font-medium">support@twistedteesboutique.com</span></p>
+                            </div>
+                        </div>
+                    `
+                },
+                'support': {
+                    title: 'Customer Support',
+                    content: `
+                        <div class="space-y-6">
+                            <div class="text-center">
+                                <p class="text-gray-700 mb-6">Our support team is here to help! Choose the best way to reach us.</p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg p-4 text-center">
+                                    <div class="text-3xl mb-2">💬</div>
+                                    <h4 class="font-semibold gradient-text mb-2">Live Chat</h4>
+                                    <p class="text-gray-700 text-sm mb-3">Get instant help from our team</p>
+                                    <button class="btn-primary text-white px-4 py-2 rounded-lg text-sm hover:scale-105 transition-all">Start Chat</button>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4 text-center">
+                                    <div class="text-3xl mb-2">📞</div>
+                                    <h4 class="font-semibold gradient-text mb-2">Phone Support</h4>
+                                    <p class="text-gray-700 text-sm mb-3">Speak directly with our team</p>
+                                    <p class="font-medium text-gray-900">1-800-TWISTED</p>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 text-center">
+                                    <div class="text-3xl mb-2">📧</div>
+                                    <h4 class="font-semibold gradient-text mb-2">Email Support</h4>
+                                    <p class="text-gray-700 text-sm mb-3">Detailed help via email</p>
+                                    <p class="font-medium text-gray-900 text-sm">support@twistedteesboutique.com</p>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 text-center">
+                                    <div class="text-3xl mb-2">❓</div>
+                                    <h4 class="font-semibold gradient-text mb-2">Help Center</h4>
+                                    <p class="text-gray-700 text-sm mb-3">Browse our knowledge base</p>
+                                    <button class="btn-primary text-white px-4 py-2 rounded-lg text-sm hover:scale-105 transition-all">Browse FAQ</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4">
+                                <h4 class="font-semibold gradient-text mb-3">Common Support Topics:</h4>
+                                <div class="grid md:grid-cols-2 gap-2 text-sm text-gray-700">
+                                    <div>• Order status and tracking</div>
+                                    <div>• Returns and exchanges</div>
+                                    <div>• Size and fit questions</div>
+                                    <div>• Payment and billing</div>
+                                    <div>• Product availability</div>
+                                    <div>• Account management</div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                                <p><strong>Response Times:</strong> Live chat (immediate), Phone (immediate), Email (within 24 hours)</p>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            return content[type] || { title: 'Information', content: '<p>Content not available.</p>' };
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
         // Newsletter subscription
-        document.querySelector('button:contains("Subscribe")').addEventListener('click', function() {
-            const emailInput = document.querySelector('input[type="email"]');
-            if (emailInput.value) {
-                alert('Thank you for subscribing!');
-                emailInput.value = '';
-            } else {
-                alert('Please enter a valid email address.');
+        document.querySelector('button').addEventListener('click', function() {
+            if (this.textContent.includes('Subscribe')) {
+                const emailInput = document.querySelector('input[type="email"]');
+                if (emailInput.value) {
+                    alert('Thank you for subscribing!');
+                    emailInput.value = '';
+                } else {
+                    alert('Please enter a valid email address.');
+                }
             }
         });
 
@@ -485,5 +861,5 @@
             });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96818758a2dfb23b',t:'MTc1NDAxMTM5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96818ca733feb23b',t:'MTc1NDAxMTYwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
