@@ -298,96 +298,155 @@
     </footer>
 
     <script>
-        // Product data
-        const products = [
-            { id: 1, name: "Rainbow Tie-Dye Tee", price: 29.99, image: "🌈", category: "tees", description: "Vibrant tie-dye design" },
-            { id: 2, name: "Cosmic Galaxy Hoodie", price: 49.99, image: "🌌", category: "hoodies", description: "Out-of-this-world style" },
-            { id: 3, name: "Neon Dreams Tank", price: 24.99, image: "💫", category: "tanks", description: "Electric neon vibes" },
-            { id: 4, name: "Sunset Gradient Dress", price: 39.99, image: "🌅", category: "dresses", description: "Beautiful sunset colors" },
-            { id: 5, name: "Electric Blue Bomber", price: 59.99, image: "⚡", category: "jackets", description: "Bold electric style" },
-            { id: 6, name: "Flower Power Crop Top", price: 27.99, image: "🌸", category: "tops", description: "Retro floral design" },
-            { id: 7, name: "Holographic Windbreaker", price: 54.99, image: "✨", category: "jackets", description: "Futuristic holographic finish" },
-            { id: 8, name: "Pastel Dreams Sweater", price: 44.99, image: "🦄", category: "sweaters", description: "Soft pastel perfection" }
-        ];
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api'; // Change to your production URL
 
-        const saleProducts = [
-            { id: 9, name: "Vintage Band Tee", price: 19.99, originalPrice: 34.99, image: "🎸", category: "tees", description: "Classic vintage style" },
-            { id: 10, name: "Grunge Plaid Shirt", price: 24.99, originalPrice: 39.99, image: "🖤", category: "shirts", description: "90s grunge aesthetic" },
-            { id: 11, name: "Boho Maxi Dress", price: 29.99, originalPrice: 49.99, image: "🌻", category: "dresses", description: "Bohemian chic style" }
-        ];
-
+        let products = [];
+        let saleProducts = [];
         let cart = [];
 
-        // Load products
-        function loadProducts() {
+        // Load products from Shopify backend
+        async function loadProducts() {
             const productsGrid = document.getElementById('products-grid');
             const saleGrid = document.getElementById('sale-grid');
 
-            // Load regular products
-            products.forEach(product => {
-                const productCard = createProductCard(product);
-                productsGrid.appendChild(productCard);
-            });
+            try {
+                // Show loading state
+                productsGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-2xl">Loading products...</div></div>';
+                saleGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-2xl text-white">Loading sale items...</div></div>';
 
-            // Load sale products
-            saleProducts.forEach(product => {
-                const productCard = createProductCard(product, true);
-                saleGrid.appendChild(productCard);
-            });
+                // Fetch all products
+                const productsResponse = await fetch(`${API_BASE_URL}/products`);
+                const productsData = await productsResponse.json();
+                
+                if (productsData.products) {
+                    products = productsData.products.filter(p => !p.isOnSale);
+                    
+                    // Clear loading and add products
+                    productsGrid.innerHTML = '';
+                    products.forEach(product => {
+                        const productCard = createProductCard(product);
+                        productsGrid.appendChild(productCard);
+                    });
+                }
+
+                // Fetch sale products
+                const saleResponse = await fetch(`${API_BASE_URL}/products/sale`);
+                const saleData = await saleResponse.json();
+                
+                if (saleData.products) {
+                    saleProducts = saleData.products;
+                    
+                    // Clear loading and add sale products
+                    saleGrid.innerHTML = '';
+                    saleProducts.forEach(product => {
+                        const productCard = createProductCard(product, true);
+                        saleGrid.appendChild(productCard);
+                    });
+                }
+
+                if (products.length === 0) {
+                    productsGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-xl text-gray-600">No products available at the moment.</div></div>';
+                }
+
+                if (saleProducts.length === 0) {
+                    saleGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-xl text-white">No sale items available at the moment.</div></div>';
+                }
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                productsGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-xl text-red-600">Error loading products. Please try again later.</div></div>';
+                saleGrid.innerHTML = '<div class="col-span-full text-center py-8"><div class="text-xl text-white">Error loading sale items. Please try again later.</div></div>';
+            }
         }
 
         function createProductCard(product, isSale = false) {
             const card = document.createElement('div');
             card.className = 'bg-white rounded-lg shadow-lg overflow-hidden product-card transition-transform duration-300';
             
+            // Handle product image - use Shopify image or fallback to emoji
+            const productImage = product.image && product.image.startsWith('http') 
+                ? `<img src="${product.image}" alt="${product.title}" class="w-full h-48 object-cover">`
+                : `<div class="h-48 bg-gradient-to-br from-twisted-pink to-twisted-purple flex items-center justify-center text-6xl">${product.image || '👕'}</div>`;
+            
+            const price = parseFloat(product.price || product.variants?.[0]?.price || 0);
+            const comparePrice = product.compareAtPrice || product.variants?.[0]?.compareAtPrice;
+            
             card.innerHTML = `
-                <div class="h-48 bg-gradient-to-br from-twisted-pink to-twisted-purple flex items-center justify-center text-6xl">
-                    ${product.image}
-                </div>
+                ${productImage}
                 <div class="p-6">
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${product.name}</h3>
-                    <p class="text-gray-600 mb-4">${product.description}</p>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${product.title || product.name}</h3>
+                    <p class="text-gray-600 mb-4">${product.description || product.bodyHtml?.substring(0, 100) + '...' || 'No description available'}</p>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <span class="text-2xl font-bold text-twisted-purple">$${product.price}</span>
-                            ${isSale ? `<span class="text-lg text-gray-500 line-through">$${product.originalPrice}</span>` : ''}
-                            ${isSale ? `<span class="bg-red-500 text-white px-2 py-1 rounded text-sm">SALE</span>` : ''}
+                            <span class="text-2xl font-bold text-twisted-purple">$${price.toFixed(2)}</span>
+                            ${comparePrice && comparePrice > price ? `<span class="text-lg text-gray-500 line-through">$${parseFloat(comparePrice).toFixed(2)}</span>` : ''}
+                            ${comparePrice && comparePrice > price ? `<span class="bg-red-500 text-white px-2 py-1 rounded text-sm">SALE</span>` : ''}
                         </div>
                     </div>
-                    <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.image}')" 
-                            class="w-full mt-4 bg-gradient-to-r from-twisted-pink to-twisted-purple text-white py-2 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all font-semibold">
-                        Add to Cart
-                    </button>
+                    <div class="mt-4">
+                        ${product.variants && product.variants.length > 1 ? `
+                            <select id="variant-${product.id}" class="w-full mb-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-twisted-pink">
+                                ${product.variants.map(variant => 
+                                    `<option value="${variant.id}" data-price="${variant.price}">${variant.title} - $${parseFloat(variant.price).toFixed(2)}</option>`
+                                ).join('')}
+                            </select>
+                        ` : ''}
+                        <button onclick="addToCart('${product.id}', '${(product.title || product.name).replace(/'/g, "\\'")}', ${price}, '${product.image || '👕'}', '${product.variants?.[0]?.id || ''}')" 
+                                class="w-full bg-gradient-to-r from-twisted-pink to-twisted-purple text-white py-2 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all font-semibold">
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
             `;
             
             return card;
         }
 
-        function addToCart(id, name, price, image) {
-            const existingItem = cart.find(item => item.id === id);
+        function addToCart(id, name, price, image, variantId = '') {
+            // Get selected variant if multiple variants exist
+            const variantSelect = document.getElementById(`variant-${id}`);
+            let selectedVariantId = variantId;
+            let selectedPrice = price;
+            
+            if (variantSelect) {
+                const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+                selectedVariantId = selectedOption.value;
+                selectedPrice = parseFloat(selectedOption.dataset.price);
+            }
+            
+            const cartItemId = `${id}-${selectedVariantId}`;
+            const existingItem = cart.find(item => item.cartId === cartItemId);
             
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
-                cart.push({ id, name, price, image, quantity: 1 });
+                cart.push({ 
+                    cartId: cartItemId,
+                    id, 
+                    variantId: selectedVariantId,
+                    name, 
+                    price: selectedPrice, 
+                    image, 
+                    quantity: 1 
+                });
             }
             
             updateCartDisplay();
             showCartNotification(name);
         }
 
-        function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
+        function removeFromCart(cartId) {
+            cart = cart.filter(item => item.cartId !== cartId);
             updateCartDisplay();
         }
 
-        function updateQuantity(id, change) {
-            const item = cart.find(item => item.id === id);
+        function updateQuantity(cartId, change) {
+            const item = cart.find(item => item.cartId === cartId);
             if (item) {
                 item.quantity += change;
                 if (item.quantity <= 0) {
-                    removeFromCart(id);
+                    removeFromCart(cartId);
                 } else {
                     updateCartDisplay();
                 }
@@ -415,20 +474,24 @@
             cart.forEach(item => {
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item bg-gray-50 p-4 rounded-lg';
+                const itemImage = item.image && item.image.startsWith('http') 
+                    ? `<img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded">`
+                    : `<div class="text-2xl">${item.image}</div>`;
+                
                 cartItem.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
-                            <div class="text-2xl">${item.image}</div>
+                            ${itemImage}
                             <div>
                                 <h4 class="font-semibold text-sm">${item.name}</h4>
-                                <p class="text-twisted-purple font-bold">$${item.price}</p>
+                                <p class="text-twisted-purple font-bold">$${item.price.toFixed(2)}</p>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-300 text-gray-700 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-400 transition-colors">-</button>
+                            <button onclick="updateQuantity('${item.cartId}', -1)" class="bg-gray-300 text-gray-700 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-400 transition-colors">-</button>
                             <span class="font-semibold">${item.quantity}</span>
-                            <button onclick="updateQuantity(${item.id}, 1)" class="bg-twisted-pink text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">+</button>
-                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 ml-2">🗑️</button>
+                            <button onclick="updateQuantity('${item.cartId}', 1)" class="bg-twisted-pink text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">+</button>
+                            <button onclick="removeFromCart('${item.cartId}')" class="text-red-500 hover:text-red-700 ml-2">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -453,20 +516,52 @@
             }, 3000);
         }
 
-        function checkout() {
+        async function checkout() {
             if (cart.length === 0) {
                 alert('Your cart is empty!');
                 return;
             }
             
-            // Simulate Shopify Pay integration
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            alert(`Redirecting to Shopify Pay for checkout...\nTotal: $${total.toFixed(2)}\n\nNote: This is a demo - Shopify Pay integration would be handled server-side in a real implementation.`);
-            
-            // Clear cart after "checkout"
-            cart = [];
-            updateCartDisplay();
-            toggleCart();
+            try {
+                // Show loading state
+                const checkoutButton = document.querySelector('button[onclick="checkout()"]');
+                const originalText = checkoutButton.textContent;
+                checkoutButton.textContent = 'Processing...';
+                checkoutButton.disabled = true;
+                
+                // Prepare line items for Shopify
+                const lineItems = cart.map(item => ({
+                    variantId: item.variantId,
+                    quantity: item.quantity
+                }));
+                
+                // Create checkout via backend
+                const response = await fetch(`${API_BASE_URL}/checkout/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ lineItems })
+                });
+                
+                const checkoutData = await response.json();
+                
+                if (checkoutData.success && checkoutData.checkoutUrl) {
+                    // Redirect to Shopify checkout
+                    window.location.href = checkoutData.checkoutUrl;
+                } else {
+                    throw new Error(checkoutData.error || 'Failed to create checkout');
+                }
+                
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('There was an error processing your checkout. Please try again.');
+                
+                // Reset button
+                const checkoutButton = document.querySelector('button[onclick="checkout()"]');
+                checkoutButton.textContent = 'Checkout with Shopify Pay';
+                checkoutButton.disabled = false;
+            }
         }
 
         function handleContactForm(event) {
@@ -510,5 +605,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a497009348cf3e',t:'MTc1NDM3OTAzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a4a0ba52c5be76',t:'MTc1NDM3OTQzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
