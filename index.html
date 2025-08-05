@@ -3,343 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twisted Tees Boutique - Squarespace Ready</title>
+    <title>TwistedTeesBotique - Unique Fashion for Everyone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'brand-pink': '#ff6b9d',
-                        'brand-purple': '#8b5cf6',
-                        'brand-blue': '#06b6d4',
-                        'brand-orange': '#f97316'
+                        'twisted-pink': '#ff6b9d',
+                        'twisted-purple': '#8b5cf6',
+                        'twisted-blue': '#06b6d4',
+                        'twisted-green': '#10b981',
+                        'twisted-orange': '#f59e0b'
                     }
                 }
             }
         }
     </script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .gradient-bg {
-            background: linear-gradient(135deg, #ff6b9d 0%, #8b5cf6 50%, #06b6d4 100%);
+            background: linear-gradient(135deg, #ff6b9d 0%, #8b5cf6 25%, #06b6d4 50%, #10b981 75%, #f59e0b 100%);
         }
-        .product-hover {
-            transition: all 0.3s ease;
+        .cart-item {
+            animation: slideIn 0.3s ease-out;
         }
-        .product-hover:hover {
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        }
-        .section-padding {
-            padding: 80px 0;
-        }
-        .squarespace-nav {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-        .announcement-bar {
-            background: linear-gradient(90deg, #ff6b9d, #8b5cf6, #06b6d4);
-            animation: gradient 3s ease infinite;
-            background-size: 200% 200%;
-        }
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .section-scroll {
-            scroll-margin-top: 100px;
+            transition: transform 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-white font-sans">
-    
-    <!-- Announcement Bar (Squarespace Promo Bar) -->
-    <div class="announcement-bar text-white py-3 text-center">
-        <div class="container mx-auto px-4">
-            <p class="font-semibold">🔥 FREE SHIPPING ON ORDERS OVER $75 | USE CODE: FREESHIP75 🔥</p>
+<body class="bg-gradient-to-br from-pink-50 to-purple-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-bg bg-clip-text text-transparent">TwistedTeesBotique</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" class="text-gray-700 hover:text-twisted-pink px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="#products" class="text-gray-700 hover:text-twisted-purple px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</a>
+                        <a href="#sale" class="text-gray-700 hover:text-twisted-blue px-3 py-2 rounded-md text-sm font-medium transition-colors">Sale</a>
+                        <a href="#about" class="text-gray-700 hover:text-twisted-green px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="#reviews" class="text-gray-700 hover:text-twisted-orange px-3 py-2 rounded-md text-sm font-medium transition-colors">Reviews</a>
+                        <a href="#contact" class="text-gray-700 hover:text-twisted-pink px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleCart()" class="relative bg-twisted-pink text-white px-4 py-2 rounded-full hover:bg-pink-600 transition-colors">
+                        Cart (<span id="cart-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Shopping Cart</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="cart-items" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                <!-- Cart items will be added here -->
+            </div>
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold">Total: $<span id="cart-total">0.00</span></span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-twisted-purple text-white py-3 rounded-lg hover:bg-purple-600 transition-colors font-semibold">
+                    Checkout with Shopify Pay
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Header (Squarespace Header Section) -->
-    <header class="squarespace-nav sticky top-0 z-50 border-b">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo Area (Squarespace Logo Block) -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-brand-pink to-brand-purple rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold">TT</span>
-                    </div>
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                        Twisted Tees Boutique
-                    </h1>
-                </div>
-
-                <!-- Navigation (Squarespace Navigation) -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#home" class="text-gray-700 hover:text-brand-pink font-medium transition-colors">Home</a>
-                    <a href="#shop" class="text-gray-700 hover:text-brand-pink font-medium transition-colors">Shop</a>
-                    <a href="#about" class="text-gray-700 hover:text-brand-pink font-medium transition-colors">About</a>
-                    <a href="#contact" class="text-gray-700 hover:text-brand-pink font-medium transition-colors">Contact</a>
-                </nav>
-
-                <!-- Cart Icon (Squarespace Commerce) -->
-                <div class="flex items-center space-x-4">
-                    <button class="text-gray-700 hover:text-brand-pink transition-colors">
-                        <i class="fas fa-search text-xl"></i>
-                    </button>
-                    <button class="relative text-gray-700 hover:text-brand-pink transition-colors">
-                        <i class="fas fa-shopping-bag text-xl"></i>
-                        <span class="absolute -top-2 -right-2 bg-brand-pink text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Banner (Squarespace Banner Section) -->
-    <section id="home" class="gradient-bg text-white section-padding text-center">
-        <div class="container mx-auto px-4">
-            <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                Express Your<br>Unique Style
-            </h2>
-            <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-                Discover our handpicked collection of trendy tees, hoodies, and accessories that speak your language
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
+                Welcome to TwistedTeesBotique
+            </h1>
+            <p class="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto">
+                Discover unique, colorful fashion that expresses your personality. From trendy tees to statement pieces!
             </p>
-            <div class="space-x-4">
-                <a href="#shop" class="bg-white text-brand-pink px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all inline-block">
-                    Shop Collection
-                </a>
-                <a href="#about" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-brand-pink transition-all inline-block">
-                    Our Story
-                </a>
-            </div>
+            <a href="#products" class="bg-white text-twisted-pink px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
+                Shop Now
+            </a>
         </div>
     </section>
 
-    <!-- Featured Categories (Squarespace Gallery Section) -->
-    <section class="section-padding bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h3 class="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                Shop by Category
-            </h3>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="product-hover bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <div class="h-64 bg-gradient-to-br from-brand-pink to-brand-purple flex items-center justify-center">
-                        <i class="fas fa-tshirt text-6xl text-white"></i>
-                    </div>
-                    <div class="p-6 text-center">
-                        <h4 class="text-2xl font-bold mb-2">Graphic Tees</h4>
-                        <p class="text-gray-600 mb-4">Express yourself with our unique designs</p>
-                        <button class="bg-brand-pink text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all">
-                            Shop Tees
-                        </button>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <div class="h-64 bg-gradient-to-br from-brand-purple to-brand-blue flex items-center justify-center">
-                        <i class="fas fa-hoodie text-6xl text-white"></i>
-                    </div>
-                    <div class="p-6 text-center">
-                        <h4 class="text-2xl font-bold mb-2">Hoodies</h4>
-                        <p class="text-gray-600 mb-4">Cozy comfort meets street style</p>
-                        <button class="bg-brand-purple text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all">
-                            Shop Hoodies
-                        </button>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-2xl overflow-hidden shadow-lg">
-                    <div class="h-64 bg-gradient-to-br from-brand-blue to-brand-orange flex items-center justify-center">
-                        <i class="fas fa-gem text-6xl text-white"></i>
-                    </div>
-                    <div class="p-6 text-center">
-                        <h4 class="text-2xl font-bold mb-2">Accessories</h4>
-                        <p class="text-gray-600 mb-4">Complete your look with style</p>
-                        <button class="bg-brand-blue text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all">
-                            Shop Accessories
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- New Arrivals Section -->
-    <section id="new-arrivals" class="section-scroll section-padding">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h3 class="text-4xl font-bold mb-4 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                    New Arrivals
-                </h3>
-                <p class="text-xl text-gray-600">Fresh styles just dropped</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-orange to-brand-pink flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">NEW</span>
-                    </div>
-                    <div class="p-6">
-                        <span class="bg-brand-orange text-white px-2 py-1 rounded-full text-xs font-bold">NEW</span>
-                        <h4 class="text-lg font-bold mb-2 mt-2">Electric Dreams Tee</h4>
-                        <p class="text-gray-600 text-sm mb-3">Limited edition design</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$32.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">NEW</span>
-                    </div>
-                    <div class="p-6">
-                        <span class="bg-brand-orange text-white px-2 py-1 rounded-full text-xs font-bold">NEW</span>
-                        <h4 class="text-lg font-bold mb-2 mt-2">Cosmic Hoodie</h4>
-                        <p class="text-gray-600 text-sm mb-3">Glow-in-the-dark print</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$64.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-pink to-brand-orange flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">NEW</span>
-                    </div>
-                    <div class="p-6">
-                        <span class="bg-brand-orange text-white px-2 py-1 rounded-full text-xs font-bold">NEW</span>
-                        <h4 class="text-lg font-bold mb-2 mt-2">Neon Bucket Hat</h4>
-                        <p class="text-gray-600 text-sm mb-3">Reflective material</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$19.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <!-- Products Gallery -->
+    <section id="products" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 gradient-bg bg-clip-text text-transparent">Our Collection</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="products-grid">
+                <!-- Products will be loaded here -->
             </div>
         </div>
     </section>
 
     <!-- Sale Section -->
-    <section id="sale" class="section-scroll section-padding bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h3 class="text-4xl font-bold mb-4 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                    🔥 Sale Items
-                </h3>
-                <p class="text-xl text-gray-600">Limited time offers - up to 50% off!</p>
+    <section id="sale" class="py-16 bg-gradient-to-r from-twisted-pink to-twisted-purple">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-white">🔥 Hot Deals 🔥</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="sale-grid">
+                <!-- Sale items will be loaded here -->
             </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-purple to-brand-blue flex items-center justify-center relative">
-                        <span class="text-white text-2xl font-bold">SALE</span>
-                        <div class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">-40%</div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Vintage Logo Tee</h4>
-                        <p class="text-gray-600 text-sm mb-3">Classic design</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-lg text-gray-500 line-through">$29.99</span>
-                                <span class="text-2xl font-bold text-brand-pink ml-2">$17.99</span>
-                            </div>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </section>
 
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-pink to-brand-orange flex items-center justify-center relative">
-                        <span class="text-white text-2xl font-bold">SALE</span>
-                        <div class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">-30%</div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Retro Sweatshirt</h4>
-                        <p class="text-gray-600 text-sm mb-3">Cozy cotton blend</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-lg text-gray-500 line-through">$49.99</span>
-                                <span class="text-2xl font-bold text-brand-pink ml-2">$34.99</span>
-                            </div>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-6 gradient-bg bg-clip-text text-transparent">About TwistedTeesBotique</h2>
+                <div class="max-w-4xl mx-auto">
+                    <p class="text-lg text-gray-700 mb-6">
+                        Founded with a passion for unique fashion, TwistedTeesBotique brings you carefully curated clothing that stands out from the crowd. We believe fashion should be fun, expressive, and accessible to everyone.
+                    </p>
+                    <p class="text-lg text-gray-700 mb-8">
+                        Our team scours the globe for the most creative designs, sustainable materials, and emerging trends to bring you pieces that make you feel confident and authentic.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <div class="bg-twisted-pink text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🎨</div>
+                            <h3 class="text-xl font-semibold mb-2">Unique Designs</h3>
+                            <p class="text-gray-600">Hand-picked pieces you won't find anywhere else</p>
                         </div>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center relative">
-                        <span class="text-white text-2xl font-bold">SALE</span>
-                        <div class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">-50%</div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Summer Tank</h4>
-                        <p class="text-gray-600 text-sm mb-3">Lightweight fabric</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-lg text-gray-500 line-through">$24.99</span>
-                                <span class="text-2xl font-bold text-brand-pink ml-2">$12.49</span>
-                            </div>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+                        <div class="text-center">
+                            <div class="bg-twisted-blue text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🌱</div>
+                            <h3 class="text-xl font-semibold mb-2">Sustainable</h3>
+                            <p class="text-gray-600">Eco-friendly materials and ethical production</p>
                         </div>
-                    </div>
-                </div>
-
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-orange to-brand-pink flex items-center justify-center relative">
-                        <span class="text-white text-2xl font-bold">SALE</span>
-                        <div class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">-25%</div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Denim Jacket</h4>
-                        <p class="text-gray-600 text-sm mb-3">Distressed finish</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-lg text-gray-500 line-through">$79.99</span>
-                                <span class="text-2xl font-bold text-brand-pink ml-2">$59.99</span>
-                            </div>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+                        <div class="text-center">
+                            <div class="bg-twisted-green text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">💝</div>
+                            <h3 class="text-xl font-semibold mb-2">Quality First</h3>
+                            <p class="text-gray-600">Premium materials that last and feel amazing</p>
                         </div>
                     </div>
                 </div>
@@ -347,496 +158,330 @@
         </div>
     </section>
 
-    <!-- Product Showcase (Squarespace Product Blocks) -->
-    <section id="shop" class="section-scroll section-padding">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h3 class="text-4xl font-bold mb-4 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                    Shop All Products
-                </h3>
-                <p class="text-xl text-gray-600">Our complete collection</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Product 1 -->
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-pink to-brand-purple flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">Twisted Logo</span>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Twisted Logo Tee</h4>
-                        <p class="text-gray-600 text-sm mb-3">Classic fit, premium cotton</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$29.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-16 bg-gradient-to-br from-purple-50 to-pink-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 gradient-bg bg-clip-text text-transparent">What Our Customers Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-twisted-orange">
+                            ⭐⭐⭐⭐⭐
                         </div>
                     </div>
+                    <p class="text-gray-700 mb-4">"Absolutely love my new tees! The quality is amazing and the designs are so unique. I get compliments everywhere I go!"</p>
+                    <div class="font-semibold text-twisted-purple">- Sarah M.</div>
                 </div>
-
-                <!-- Product 2 -->
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-purple to-brand-blue flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">Neon Dreams</span>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Neon Dreams Hoodie</h4>
-                        <p class="text-gray-600 text-sm mb-3">Oversized fit, fleece lined</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$59.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-twisted-orange">
+                            ⭐⭐⭐⭐⭐
                         </div>
                     </div>
+                    <p class="text-gray-700 mb-4">"Fast shipping, great customer service, and the clothes fit perfectly! TwistedTeesBotique is now my go-to for trendy fashion."</p>
+                    <div class="font-semibold text-twisted-purple">- Mike R.</div>
                 </div>
-
-                <!-- Product 3 -->
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-blue to-brand-orange flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">Retro Vibes</span>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Retro Vibes Tank</h4>
-                        <p class="text-gray-600 text-sm mb-3">Relaxed fit, vintage wash</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$24.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-twisted-orange">
+                            ⭐⭐⭐⭐⭐
                         </div>
                     </div>
-                </div>
-
-                <!-- Product 4 -->
-                <div class="product-hover bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="h-80 bg-gradient-to-br from-brand-orange to-brand-pink flex items-center justify-center">
-                        <span class="text-white text-2xl font-bold">Sunset Crop</span>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Sunset Crop Top</h4>
-                        <p class="text-gray-600 text-sm mb-3">Fitted cut, soft blend</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-2xl font-bold text-brand-pink">$34.99</span>
-                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-12">
-                <button class="bg-gradient-to-r from-brand-pink to-brand-purple text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl transition-all">
-                    Load More Products
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section (Squarespace Text Section) -->
-    <section id="about" class="section-scroll section-padding bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <h3 class="text-4xl font-bold mb-8 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                    Our Story
-                </h3>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="text-left">
-                        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
-                            At Twisted Tees Boutique, we believe fashion should be fun, expressive, and accessible to everyone. Our journey started with a simple idea: create clothing that helps people show their true colors.
-                        </p>
-                        <p class="text-lg text-gray-700 leading-relaxed">
-                            Every piece in our collection is carefully selected for quality, comfort, and that special something that makes you feel confident and unique.
-                        </p>
-                        <div class="mt-8 flex space-x-6">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-brand-pink">1000+</div>
-                                <div class="text-gray-600">Happy Customers</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-brand-purple">50+</div>
-                                <div class="text-gray-600">Unique Designs</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-brand-blue">5★</div>
-                                <div class="text-gray-600">Average Rating</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="h-96 bg-gradient-to-br from-brand-pink via-brand-purple to-brand-blue rounded-2xl flex items-center justify-center">
-                        <div class="text-center text-white">
-                            <i class="fas fa-heart text-6xl mb-4"></i>
-                            <p class="text-xl font-semibold">Made with Love</p>
-                        </div>
-                    </div>
+                    <p class="text-gray-700 mb-4">"The sustainable approach and unique designs make this my favorite clothing brand. Highly recommend!"</p>
+                    <div class="font-semibold text-twisted-purple">- Emma L.</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section (Squarespace Contact Form) -->
-    <section id="contact" class="section-scroll section-padding">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto">
-                <h3 class="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-brand-pink to-brand-purple bg-clip-text text-transparent">
-                    Get In Touch
-                </h3>
-                
-                <div class="grid md:grid-cols-2 gap-12">
-                    <div>
-                        <h4 class="text-2xl font-bold mb-6">Let's Connect</h4>
-                        <div class="space-y-6">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center">
-                                    <i class="fas fa-envelope text-white"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold">Email Us</p>
-                                    <p class="text-gray-600">hello@twistedteesboutique.com</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-brand-purple rounded-full flex items-center justify-center">
-                                    <i class="fas fa-phone text-white"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold">Call Us</p>
-                                    <p class="text-gray-600">+1 (555) 123-4567</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-brand-blue rounded-full flex items-center justify-center">
-                                    <i class="fas fa-clock text-white"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold">Business Hours</p>
-                                    <p class="text-gray-600">Mon-Fri: 9AM-6PM EST</p>
-                                </div>
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 gradient-bg bg-clip-text text-transparent">Get In Touch</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-800">Contact Information</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="bg-twisted-pink text-white w-10 h-10 rounded-full flex items-center justify-center mr-4">📧</div>
+                            <div>
+                                <p class="font-semibold">Email</p>
+                                <p class="text-gray-600">hello@twistedteesbotique.com</p>
                             </div>
                         </div>
-                        
-                        <div class="mt-8">
-                            <h5 class="text-lg font-semibold mb-4">Follow Our Journey</h5>
-                            <div class="flex space-x-4">
-                                <a href="#" class="w-12 h-12 bg-gradient-to-r from-brand-pink to-brand-purple rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-gradient-to-r from-brand-purple to-brand-blue rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all">
-                                    <i class="fab fa-facebook"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-gradient-to-r from-brand-blue to-brand-orange rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <a href="#" class="w-12 h-12 bg-gradient-to-r from-brand-orange to-brand-pink rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all">
-                                    <i class="fab fa-tiktok"></i>
-                                </a>
+                        <div class="flex items-center">
+                            <div class="bg-twisted-blue text-white w-10 h-10 rounded-full flex items-center justify-center mr-4">📱</div>
+                            <div>
+                                <p class="font-semibold">Phone</p>
+                                <p class="text-gray-600">(555) 123-TEES</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-twisted-green text-white w-10 h-10 rounded-full flex items-center justify-center mr-4">📍</div>
+                            <div>
+                                <p class="font-semibold">Address</p>
+                                <p class="text-gray-600">123 Fashion Street, Style City, SC 12345</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white p-8 rounded-2xl shadow-lg">
-                        <h4 class="text-xl font-bold mb-6">Send us a Message</h4>
-                        <form class="space-y-4">
-                            <div>
-                                <input type="text" placeholder="Your Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent">
-                            </div>
-                            <div>
-                                <input type="email" placeholder="Your Email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent">
-                            </div>
-                            <div>
-                                <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent">
-                                    <option>General Inquiry</option>
-                                    <option>Order Support</option>
-                                    <option>Product Question</option>
-                                    <option>Wholesale</option>
-                                </select>
-                            </div>
-                            <div>
-                                <textarea placeholder="Your Message" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent"></textarea>
-                            </div>
-                            <button type="submit" class="w-full bg-gradient-to-r from-brand-pink to-brand-purple text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-                                Send Message
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer (Squarespace Footer) -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-8 h-8 bg-gradient-to-r from-brand-pink to-brand-purple rounded-full flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">TT</span>
+                    <div class="mt-8">
+                        <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="bg-twisted-purple text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">📘</a>
+                            <a href="#" class="bg-twisted-pink text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">📷</a>
+                            <a href="#" class="bg-twisted-blue text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-cyan-600 transition-colors">🐦</a>
                         </div>
-                        <h4 class="text-xl font-bold">Twisted Tees</h4>
                     </div>
-                    <p class="text-gray-400">Express your unique style with our curated collection of premium fashion.</p>
                 </div>
-                
                 <div>
-                    <h5 class="font-semibold mb-4">Quick Links</h5>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#shop" class="hover:text-white transition-colors">Shop All</a></li>
-                        <li><a href="#new-arrivals" class="hover:text-white transition-colors">New Arrivals</a></li>
-                        <li><a href="#sale" class="hover:text-white transition-colors">Sale</a></li>
-                        <li><a href="#" onclick="openModal('size-guide')" class="hover:text-white transition-colors cursor-pointer">Size Guide</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h5 class="font-semibold mb-4">Customer Care</h5>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" onclick="openModal('shipping')" class="hover:text-white transition-colors cursor-pointer">Shipping Info</a></li>
-                        <li><a href="#" onclick="openModal('returns')" class="hover:text-white transition-colors cursor-pointer">Returns</a></li>
-                        <li><a href="#" onclick="openModal('faq')" class="hover:text-white transition-colors cursor-pointer">FAQ</a></li>
-                        <li><a href="#contact" class="hover:text-white transition-colors">Contact Us</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h5 class="font-semibold mb-4">Newsletter</h5>
-                    <p class="text-gray-400 mb-4">Get the latest updates on new products and exclusive offers.</p>
-                    <div class="flex">
-                        <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none">
-                        <button class="bg-brand-pink px-4 py-2 rounded-r-lg hover:bg-opacity-90 transition-all">
-                            <i class="fas fa-arrow-right"></i>
+                    <form class="space-y-6" onsubmit="handleContactForm(event)">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                            <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-twisted-pink focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-twisted-pink focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-twisted-pink focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-twisted-pink to-twisted-purple text-white py-3 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all font-semibold">
+                            Send Message
                         </button>
-                    </div>
+                    </form>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Twisted Tees Boutique. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 gradient-bg bg-clip-text text-transparent">TwistedTeesBotique</h3>
+                    <p class="text-gray-400">Unique fashion for unique people. Express yourself with our carefully curated collection.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#products" class="text-gray-400 hover:text-white transition-colors">Products</a></li>
+                        <li><a href="#sale" class="text-gray-400 hover:text-white transition-colors">Sale</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">About</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Customer Care</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Shipping Info</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Size Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Stay updated with our latest collections and exclusive offers!</p>
+                    <form onsubmit="handleNewsletter(event)" class="flex">
+                        <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 bg-gray-700 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-twisted-pink">
+                        <button type="submit" class="bg-twisted-pink px-4 py-2 rounded-r-lg hover:bg-pink-600 transition-colors">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2024 TwistedTeesBotique. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Modals -->
-    <!-- Shipping Info Modal -->
-    <div id="shipping-modal" class="modal">
-        <div class="modal-content">
-            <div class="gradient-bg text-white p-6 rounded-t-2xl">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">Shipping Information</h2>
-                    <button onclick="closeModal('shipping')" class="text-white hover:text-gray-300">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-pink">Free Shipping</h3>
-                        <p class="text-gray-700">Free standard shipping on all orders over $75 within the US. Use code FREESHIP75 at checkout.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-purple">Shipping Options</h3>
-                        <ul class="space-y-2 text-gray-700">
-                            <li><strong>Standard (5-7 business days):</strong> $5.99</li>
-                            <li><strong>Express (2-3 business days):</strong> $12.99</li>
-                            <li><strong>Overnight (1 business day):</strong> $24.99</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-blue">International Shipping</h3>
-                        <p class="text-gray-700">We ship worldwide! International shipping rates calculated at checkout. Delivery times vary by location (7-21 business days).</p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-orange">Processing Time</h3>
-                        <p class="text-gray-700">All orders are processed within 1-2 business days. You'll receive a tracking number once your order ships.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Returns Modal -->
-    <div id="returns-modal" class="modal">
-        <div class="modal-content">
-            <div class="gradient-bg text-white p-6 rounded-t-2xl">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">Returns & Exchanges</h2>
-                    <button onclick="closeModal('returns')" class="text-white hover:text-gray-300">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-pink">30-Day Return Policy</h3>
-                        <p class="text-gray-700">We offer hassle-free returns within 30 days of purchase. Items must be unworn, unwashed, and in original condition with tags attached.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-purple">How to Return</h3>
-                        <ol class="list-decimal list-inside space-y-2 text-gray-700">
-                            <li>Contact us at returns@twistedteesboutique.com</li>
-                            <li>We'll send you a prepaid return label</li>
-                            <li>Pack items securely and attach the label</li>
-                            <li>Drop off at any authorized shipping location</li>
-                        </ol>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-blue">Exchanges</h3>
-                        <p class="text-gray-700">Need a different size or color? We offer free exchanges within the US. International customers receive store credit for exchanges.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-3 text-brand-orange">Refund Timeline</h3>
-                        <p class="text-gray-700">Refunds are processed within 3-5 business days after we receive your return. You'll get an email confirmation when it's complete.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FAQ Modal -->
-    <div id="faq-modal" class="modal">
-        <div class="modal-content">
-            <div class="gradient-bg text-white p-6 rounded-t-2xl">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">Frequently Asked Questions</h2>
-                    <button onclick="closeModal('faq')" class="text-white hover:text-gray-300">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-pink">What materials do you use?</h3>
-                        <p class="text-gray-700">We use premium cotton blends, organic materials, and sustainable fabrics. Each product page lists specific material details.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-purple">How do I care for my items?</h3>
-                        <p class="text-gray-700">Machine wash cold, tumble dry low. Avoid bleach and iron inside-out to preserve prints. Care instructions are on each garment tag.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-blue">Do you restock sold-out items?</h3>
-                        <p class="text-gray-700">Popular items are usually restocked within 2-4 weeks. Sign up for restock notifications on product pages to be notified first.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-orange">Can I cancel or modify my order?</h3>
-                        <p class="text-gray-700">Orders can be modified or cancelled within 2 hours of placement. After that, contact us and we'll do our best to help.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-pink">Do you offer wholesale pricing?</h3>
-                        <p class="text-gray-700">Yes! We offer wholesale pricing for orders of 20+ pieces. Contact us at wholesale@twistedteesboutique.com for details.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-2 text-brand-purple">Are your products ethically made?</h3>
-                        <p class="text-gray-700">Absolutely! We partner with certified ethical manufacturers and are committed to fair labor practices and sustainable production.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Size Guide Modal -->
-    <div id="size-guide-modal" class="modal">
-        <div class="modal-content">
-            <div class="gradient-bg text-white p-6 rounded-t-2xl">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">Size Guide</h2>
-                    <button onclick="closeModal('size-guide')" class="text-white hover:text-gray-300">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="space-y-8">
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 text-brand-pink">Women's Sizing</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full border-collapse border border-gray-300">
-                                <thead>
-                                    <tr class="bg-gray-100">
-                                        <th class="border border-gray-300 px-4 py-2">Size</th>
-                                        <th class="border border-gray-300 px-4 py-2">Bust (inches)</th>
-                                        <th class="border border-gray-300 px-4 py-2">Waist (inches)</th>
-                                        <th class="border border-gray-300 px-4 py-2">Hips (inches)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td class="border border-gray-300 px-4 py-2">XS</td><td class="border border-gray-300 px-4 py-2">32-34</td><td class="border border-gray-300 px-4 py-2">24-26</td><td class="border border-gray-300 px-4 py-2">34-36</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">S</td><td class="border border-gray-300 px-4 py-2">34-36</td><td class="border border-gray-300 px-4 py-2">26-28</td><td class="border border-gray-300 px-4 py-2">36-38</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">M</td><td class="border border-gray-300 px-4 py-2">36-38</td><td class="border border-gray-300 px-4 py-2">28-30</td><td class="border border-gray-300 px-4 py-2">38-40</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">L</td><td class="border border-gray-300 px-4 py-2">38-40</td><td class="border border-gray-300 px-4 py-2">30-32</td><td class="border border-gray-300 px-4 py-2">40-42</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">XL</td><td class="border border-gray-300 px-4 py-2">40-42</td><td class="border border-gray-300 px-4 py-2">32-34</td><td class="border border-gray-300 px-4 py-2">42-44</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 text-brand-purple">Men's Sizing</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full border-collapse border border-gray-300">
-                                <thead>
-                                    <tr class="bg-gray-100">
-                                        <th class="border border-gray-300 px-4 py-2">Size</th>
-                                        <th class="border border-gray-300 px-4 py-2">Chest (inches)</th>
-                                        <th class="border border-gray-300 px-4 py-2">Waist (inches)</th>
-                                        <th class="border border-gray-300 px-4 py-2">Length (inches)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td class="border border-gray-300 px-4 py-2">S</td><td class="border border-gray-300 px-4 py-2">34-36</td><td class="border border-gray-300 px-4 py-2">28-30</td><td class="border border-gray-300 px-4 py-2">28</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">M</td><td class="border border-gray-300 px-4 py-2">38-40</td><td class="border border-gray-300 px-4 py-2">32-34</td><td class="border border-gray-300 px-4 py-2">29</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">L</td><td class="border border-gray-300 px-4 py-2">42-44</td><td class="border border-gray-300 px-4 py-2">36-38</td><td class="border border-gray-300 px-4 py-2">30</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">XL</td><td class="border border-gray-300 px-4 py-2">46-48</td><td class="border border-gray-300 px-4 py-2">40-42</td><td class="border border-gray-300 px-4 py-2">31</td></tr>
-                                    <tr><td class="border border-gray-300 px-4 py-2">XXL</td><td class="border border-gray-300 px-4 py-2">50-52</td><td class="border border-gray-300 px-4 py-2">44-46</td><td class="border border-gray-300 px-4 py-2">32</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-bold mb-2 text-brand-blue">Measuring Tips:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-gray-700">
-                            <li>Measure over your undergarments</li>
-                            <li>Keep the measuring tape snug but not tight</li>
-                            <li>For the most accurate fit, have someone help you measure</li>
-                            <li>When in doubt, size up for a more relaxed fit</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Modal functions
-        function openModal(modalType) {
-            document.getElementById(modalType + '-modal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
+        // Product data
+        const products = [
+            { id: 1, name: "Rainbow Tie-Dye Tee", price: 29.99, image: "🌈", category: "tees", description: "Vibrant tie-dye design" },
+            { id: 2, name: "Cosmic Galaxy Hoodie", price: 49.99, image: "🌌", category: "hoodies", description: "Out-of-this-world style" },
+            { id: 3, name: "Neon Dreams Tank", price: 24.99, image: "💫", category: "tanks", description: "Electric neon vibes" },
+            { id: 4, name: "Sunset Gradient Dress", price: 39.99, image: "🌅", category: "dresses", description: "Beautiful sunset colors" },
+            { id: 5, name: "Electric Blue Bomber", price: 59.99, image: "⚡", category: "jackets", description: "Bold electric style" },
+            { id: 6, name: "Flower Power Crop Top", price: 27.99, image: "🌸", category: "tops", description: "Retro floral design" },
+            { id: 7, name: "Holographic Windbreaker", price: 54.99, image: "✨", category: "jackets", description: "Futuristic holographic finish" },
+            { id: 8, name: "Pastel Dreams Sweater", price: 44.99, image: "🦄", category: "sweaters", description: "Soft pastel perfection" }
+        ];
 
-        function closeModal(modalType) {
-            document.getElementById(modalType + '-modal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+        const saleProducts = [
+            { id: 9, name: "Vintage Band Tee", price: 19.99, originalPrice: 34.99, image: "🎸", category: "tees", description: "Classic vintage style" },
+            { id: 10, name: "Grunge Plaid Shirt", price: 24.99, originalPrice: 39.99, image: "🖤", category: "shirts", description: "90s grunge aesthetic" },
+            { id: 11, name: "Boho Maxi Dress", price: 29.99, originalPrice: 49.99, image: "🌻", category: "dresses", description: "Bohemian chic style" }
+        ];
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
+        let cart = [];
+
+        // Load products
+        function loadProducts() {
+            const productsGrid = document.getElementById('products-grid');
+            const saleGrid = document.getElementById('sale-grid');
+
+            // Load regular products
+            products.forEach(product => {
+                const productCard = createProductCard(product);
+                productsGrid.appendChild(productCard);
+            });
+
+            // Load sale products
+            saleProducts.forEach(product => {
+                const productCard = createProductCard(product, true);
+                saleGrid.appendChild(productCard);
             });
         }
 
-        // Smooth scrolling for navigation
+        function createProductCard(product, isSale = false) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-lg overflow-hidden product-card transition-transform duration-300';
+            
+            card.innerHTML = `
+                <div class="h-48 bg-gradient-to-br from-twisted-pink to-twisted-purple flex items-center justify-center text-6xl">
+                    ${product.image}
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${product.name}</h3>
+                    <p class="text-gray-600 mb-4">${product.description}</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-bold text-twisted-purple">$${product.price}</span>
+                            ${isSale ? `<span class="text-lg text-gray-500 line-through">$${product.originalPrice}</span>` : ''}
+                            ${isSale ? `<span class="bg-red-500 text-white px-2 py-1 rounded text-sm">SALE</span>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.image}')" 
+                            class="w-full mt-4 bg-gradient-to-r from-twisted-pink to-twisted-purple text-white py-2 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all font-semibold">
+                        Add to Cart
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function addToCart(id, name, price, image) {
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ id, name, price, image, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            showCartNotification(name);
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartDisplay();
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = totalPrice.toFixed(2);
+            
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty</p>';
+                return;
+            }
+            
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item bg-gray-50 p-4 rounded-lg';
+                cartItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">${item.image}</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">${item.name}</h4>
+                                <p class="text-twisted-purple font-bold">$${item.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-300 text-gray-700 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-400 transition-colors">-</button>
+                            <span class="font-semibold">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="bg-twisted-pink text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">+</button>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 ml-2">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+        }
+
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            cartSidebar.classList.toggle('translate-x-full');
+        }
+
+        function showCartNotification(productName) {
+            // Create a simple notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
+            notification.textContent = `${productName} added to cart!`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            // Simulate Shopify Pay integration
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            alert(`Redirecting to Shopify Pay for checkout...\nTotal: $${total.toFixed(2)}\n\nNote: This is a demo - Shopify Pay integration would be handled server-side in a real implementation.`);
+            
+            // Clear cart after "checkout"
+            cart = [];
+            updateCartDisplay();
+            toggleCart();
+        }
+
+        function handleContactForm(event) {
+            event.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+            event.target.reset();
+        }
+
+        function handleNewsletter(event) {
+            event.preventDefault();
+            alert('Thank you for subscribing to our newsletter!');
+            event.target.reset();
+        }
+
+        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -850,27 +495,20 @@
             });
         });
 
-        // Simple cart counter simulation
-        let cartCount = 0;
-        document.querySelectorAll('button').forEach(button => {
-            if (button.textContent.includes('Add to Cart')) {
-                button.addEventListener('click', function() {
-                    cartCount++;
-                    const cartBadge = document.querySelector('.fa-shopping-bag + span');
-                    if (cartBadge) {
-                        cartBadge.textContent = cartCount;
-                    }
-                    
-                    // Visual feedback
-                    this.textContent = 'Added!';
-                    this.classList.add('bg-green-500');
-                    setTimeout(() => {
-                        this.textContent = 'Add to Cart';
-                        this.classList.remove('bg-green-500');
-                    }, 1000);
-                });
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+
+        // Close cart when clicking outside
+        document.addEventListener('click', function(event) {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartButton = event.target.closest('button[onclick="toggleCart()"]');
+            
+            if (!cartSidebar.contains(event.target) && !cartButton && !cartSidebar.classList.contains('translate-x-full')) {
+                toggleCart();
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96839bc7b0f564c2',t:'MTc1NDAzMzE5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a497009348cf3e',t:'MTc1NDM3OTAzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
